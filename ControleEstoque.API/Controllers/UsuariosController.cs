@@ -53,6 +53,30 @@ namespace ControleEstoque.API.Controllers
                 return Unauthorized("Email ou senha inválidos.");
 
             return Ok(usuarioDto);
-        } 
+        }
+
+        [HttpPost("login-caixa")]
+        public async Task<IActionResult> LoginCaixa([FromBody] LoginCaixaDto dto)
+        {
+            var usuarioDto = await _usuarioService.LoginCaixaAsync(dto.Email, dto.Senha);
+
+            if (usuarioDto == null)
+                return Unauthorized("Email ou senha inválidos.");
+
+            return Ok(usuarioDto);
+
+          
+        }
+
+        [HttpPost("login-gerente")]
+        public async Task<IActionResult> LoginGerente([FromBody] LoginGerenteDto dto)
+        {
+            var usuarioDto = await _usuarioService.LoginGerenteAsync(dto.Email, dto.Senha);
+
+            if (usuarioDto == null)
+                return Unauthorized("Email ou senha inválidos.");
+
+            return Ok(usuarioDto);
+        }
     }
 }

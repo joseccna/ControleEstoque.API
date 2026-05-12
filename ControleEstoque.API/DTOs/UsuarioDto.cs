@@ -51,4 +51,18 @@ namespace ControleEstoque.API.DTOs
         public string Senha { get; set; } = string.Empty;
        
     }
+    public class LoginCaixaDto
+    {
+
+        public string Email { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
+
+    }
+    public class LoginGerenteDto
+    {
+
+        public string Email { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
+
+    }
 }

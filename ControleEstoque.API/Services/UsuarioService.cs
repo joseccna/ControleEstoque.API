@@ -61,6 +61,16 @@ namespace ControleEstoque.API.Services
             return MapearParaDto(caixa);
         }
 
+        public async Task<UsuarioDto> LoginCaixaAsync(string email, string senha)
+        {
+            var caixa = await _context.Caixas.FirstOrDefaultAsync(c => c.Email == email);
+            if (caixa == null || !BCrypt.Net.BCrypt.Verify(senha, caixa.SenhaHash))
+            {
+                throw new UnauthorizedAccessException("Email ou senha inválidos.");
+            }
+            return MapearParaDto(caixa);
+        }
+
         public async Task<UsuarioDto> RegistrarGerenteAsync(CriarGerenteDto dto)
         {
             var gerente = new Gerente
@@ -74,6 +84,15 @@ namespace ControleEstoque.API.Services
 
             _context.Gerentes.Add(gerente);
             await _context.SaveChangesAsync();
+            return MapearParaDto(gerente);
+        }
+        public async Task<UsuarioDto> LoginGerenteAsync(string email, string senha)
+        {
+            var gerente = await _context.Gerentes.FirstOrDefaultAsync(c => c.Email == email);
+            if (gerente == null || !BCrypt.Net.BCrypt.Verify(senha, gerente.SenhaHash))
+            {
+                throw new UnauthorizedAccessException("Email ou senha inválidos.");
+            }
             return MapearParaDto(gerente);
         }
 

@@ -14,5 +14,7 @@ namespace ControleEstoque.API.Services
 
         Task<UsuarioDto?> ObterUsuarioPorEmailAsync(string email);
         Task<UsuarioDto?> LoginClienteAsync(string email, string senha);
+        Task<UsuarioDto?> LoginGerenteAsync(string email, string senha);
+        Task<UsuarioDto?> LoginCaixaAsync(string email, string senha);
     }
 }
