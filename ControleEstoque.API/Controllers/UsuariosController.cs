@@ -1,6 +1,10 @@
+using ControleEstoque.API.Data;
 using ControleEstoque.API.DTOs;
 using ControleEstoque.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using ControleEstoque.API.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ControleEstoque.API.Controllers
 {
@@ -9,12 +13,20 @@ namespace ControleEstoque.API.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
+        private readonly ITokenService _tokenService;
+        private readonly AppDbContext _context;
 
-        public UsuariosController(IUsuarioService usuarioService)
+        public UsuariosController(
+            IUsuarioService usuarioService,
+            ITokenService tokenService,
+            AppDbContext context)
         {
             _usuarioService = usuarioService;
+            _tokenService = tokenService;
+            _context = context;
         }
 
+        [Authorize(Roles = "Gerente")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -42,5 +54,34 @@ namespace ControleEstoque.API.Controllers
             var novoGerente = await _usuarioService.RegistrarGerenteAsync(dto);
             return Ok(novoGerente);
         }
+
+
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+            if (usuario == null)
+            {
+                return Unauthorized("Usuário inválido");
+            }
+
+            // sem BCrypt por enquanto
+            if (usuario.SenhaHash != dto.Senha)
+            {
+                return Unauthorized("Senha inválida");
+            }
+
+            var token = _tokenService.GerarToken(usuario);
+
+            return Ok(new
+            {
+                token = token
+            });
+        }
+
+
     }
 }
