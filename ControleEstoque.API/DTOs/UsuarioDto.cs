@@ -10,6 +10,8 @@ namespace ControleEstoque.API.DTOs
         public string? CPF { get; set; }
         public string? Turno { get; set; }
         public string? Setor { get; set; }
+
+        public string senha { get; set; } = string.Empty;
     }
 
     public class ClienteDto
@@ -40,5 +42,13 @@ namespace ControleEstoque.API.DTOs
         public string Email { get; set; } = string.Empty;
         public string Senha { get; set; } = string.Empty;
         public string Setor { get; set; } = string.Empty;
+    }
+
+    public class LoginClienteDto
+    {
+       
+        public string Email { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
+       
     }
 }

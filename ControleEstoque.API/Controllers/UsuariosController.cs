@@ -1,5 +1,6 @@
 using ControleEstoque.API.DTOs;
 using ControleEstoque.API.Services;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ControleEstoque.API.Controllers
@@ -42,5 +43,16 @@ namespace ControleEstoque.API.Controllers
             var novoGerente = await _usuarioService.RegistrarGerenteAsync(dto);
             return Ok(novoGerente);
         }
+
+        [HttpPost("login-cliente")]
+        public async Task<IActionResult> LoginCliente([FromBody] LoginClienteDto dto)
+        {
+            var usuarioDto = await _usuarioService.LoginClienteAsync(dto.Email, dto.Senha);
+
+            if (usuarioDto == null)
+                return Unauthorized("Email ou senha inválidos.");
+
+            return Ok(usuarioDto);
+        } 
     }
 }
