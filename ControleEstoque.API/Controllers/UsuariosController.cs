@@ -61,23 +61,28 @@ namespace ControleEstoque.API.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            var usuario = await _context.Usuarios
+         .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            var token = _tokenService.GerarToken(usuario);
+
+
+
             try
             {
-                var usuario = await _usuarioService.LoginAsync(dto.Email, dto.Senha);
+                var verificacao = await _usuarioService.LoginAsync(dto.Email, dto.Senha);
                 // Se desejar, gere e retorne um JWT aqui em vez de apenas o DTO.
-                return Ok(usuario);
+                return Ok(new
+                {
+                    token = token
+                });
             }
             catch (UnauthorizedAccessException)
             {
                 return Unauthorized(new { mensagem = "Email ou senha inv�lidos." });
             }
 
-            var token = _tokenService.GerarToken(usuario);
 
-            return Ok(new
-            {
-                token = token
-            });
+
         }
     }
 }

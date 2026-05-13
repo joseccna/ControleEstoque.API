@@ -13,7 +13,7 @@ namespace ControleEstoque.API.Services
         Task<IEnumerable<UsuarioDto>> ListarTodosUsuariosAsync();
 
         Task<UsuarioDto?> ObterUsuarioPorEmailAsync(string email);
-        Task<UsuarioDto?> LoginAsync(string email, string senha);
+        Task<LoginDto?> LoginAsync(string email, string senha);
        
     }
 }

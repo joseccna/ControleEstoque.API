@@ -101,7 +101,7 @@ namespace ControleEstoque.API.Services
         }
 
 
-        public async Task<loginDto?> LoginAsync(string email, string senha)
+        public async Task<LoginDto?> LoginAsync(string email, string senha)
         {
             // Tenta encontrar usu�rio na tabela base Usuarios (TPH) primeiro
             var usuario = await _context.Usuarios
@@ -114,7 +114,7 @@ namespace ControleEstoque.API.Services
             {
                 if (!BCrypt.Net.BCrypt.Verify(senha, cliente.SenhaHash))
                     throw new UnauthorizedAccessException("Email ou senha inv�lidos.");
-                return MapearParaDto(cliente);
+                
             }
 
             var caixa = await _context.Caixas.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
@@ -122,7 +122,6 @@ namespace ControleEstoque.API.Services
             {
                 if (!BCrypt.Net.BCrypt.Verify(senha, caixa.SenhaHash))
                     throw new UnauthorizedAccessException("Email ou senha inv�lidos.");
-                return MapearParaDto(caixa);
             }
 
             var gerente = await _context.Gerentes.AsNoTracking().FirstOrDefaultAsync(g => g.Email == email);
@@ -130,7 +129,6 @@ namespace ControleEstoque.API.Services
             {
                 if (!BCrypt.Net.BCrypt.Verify(senha, gerente.SenhaHash))
                     throw new UnauthorizedAccessException("Email ou senha inv�lidos.");
-                return MapearParaDto(gerente);
             }
 
             return null;
