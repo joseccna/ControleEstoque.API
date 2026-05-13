@@ -44,39 +44,23 @@ namespace ControleEstoque.API.Controllers
             return Ok(novoGerente);
         }
 
-        [HttpPost("login-cliente")]
-        public async Task<IActionResult> LoginCliente([FromBody] LoginClienteDto dto)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var usuarioDto = await _usuarioService.LoginClienteAsync(dto.Email, dto.Senha);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (usuarioDto == null)
-                return Unauthorized("Email ou senha inválidos.");
-
-            return Ok(usuarioDto);
+            try
+            {
+                var usuario = await _usuarioService.LoginAsync(dto.Email, dto.Senha);
+                // Se desejar, gere e retorne um JWT aqui em vez de apenas o DTO.
+                return Ok(usuario);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { mensagem = "Email ou senha inválidos." });
+            }
         }
 
-        [HttpPost("login-caixa")]
-        public async Task<IActionResult> LoginCaixa([FromBody] LoginCaixaDto dto)
-        {
-            var usuarioDto = await _usuarioService.LoginCaixaAsync(dto.Email, dto.Senha);
 
-            if (usuarioDto == null)
-                return Unauthorized("Email ou senha inválidos.");
-
-            return Ok(usuarioDto);
-
-          
-        }
-
-        [HttpPost("login-gerente")]
-        public async Task<IActionResult> LoginGerente([FromBody] LoginGerenteDto dto)
-        {
-            var usuarioDto = await _usuarioService.LoginGerenteAsync(dto.Email, dto.Senha);
-
-            if (usuarioDto == null)
-                return Unauthorized("Email ou senha inválidos.");
-
-            return Ok(usuarioDto);
-        }
     }
 }
