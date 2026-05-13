@@ -1,7 +1,10 @@
 using ControleEstoque.API.Data;
 using ControleEstoque.API.DTOs;
 using ControleEstoque.API.Models;
+using DevOne.Security.Cryptography.BCrypt;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using BCrypt.Net;
 
 namespace ControleEstoque.API.Services
 {
@@ -14,13 +17,15 @@ namespace ControleEstoque.API.Services
             _context = context;
         }
 
+
         public async Task<UsuarioDto> RegistrarClienteAsync(CriarClienteDto dto)
         {
+
             var cliente = new Cliente
             {
                 Nome = dto.Nome,
                 Email = dto.Email,
-                SenhaHash = dto.Senha, // Sem criptografia nesta etapa inicial
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
                 CPF = dto.CPF,
                 Perfil = PerfilUsuario.Cliente
             };
@@ -30,13 +35,15 @@ namespace ControleEstoque.API.Services
             return MapearParaDto(cliente);
         }
 
+
+
         public async Task<UsuarioDto> RegistrarCaixaAsync(CriarCaixaDto dto)
         {
             var caixa = new Caixa
             {
                 Nome = dto.Nome,
                 Email = dto.Email,
-                SenhaHash = dto.Senha,
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
                 Turno = dto.Turno,
                 Perfil = PerfilUsuario.Caixa
             };
@@ -46,13 +53,15 @@ namespace ControleEstoque.API.Services
             return MapearParaDto(caixa);
         }
 
+
+
         public async Task<UsuarioDto> RegistrarGerenteAsync(CriarGerenteDto dto)
         {
             var gerente = new Gerente
             {
                 Nome = dto.Nome,
                 Email = dto.Email,
-                SenhaHash = dto.Senha,
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
                 Setor = dto.Setor,
                 Perfil = PerfilUsuario.Gerente
             };
@@ -61,6 +70,7 @@ namespace ControleEstoque.API.Services
             await _context.SaveChangesAsync();
             return MapearParaDto(gerente);
         }
+
 
         public async Task<IEnumerable<UsuarioDto>> ListarTodosUsuariosAsync()
         {
@@ -78,12 +88,52 @@ namespace ControleEstoque.API.Services
         {
             var dto = new UsuarioDto
             {
-                Id = usuario.Id, Nome = usuario.Nome, Email = usuario.Email, Perfil = usuario.Perfil.ToString()
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+                Perfil = usuario.Perfil.ToString(),
+
             };
             if (usuario is Cliente cliente) dto.CPF = cliente.CPF;
             if (usuario is Caixa caixa) dto.Turno = caixa.Turno;
             if (usuario is Gerente gerente) dto.Setor = gerente.Setor;
             return dto;
+        }
+
+
+        public async Task<UsuarioDto?> LoginAsync(string email, string senha)
+        {
+            // Tenta encontrar usuário na tabela base Usuarios (TPH) primeiro
+            var usuario = await _context.Usuarios
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+           
+            var cliente = await _context.Clientes.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
+            if (cliente != null)
+            {
+                if (!BCrypt.Net.BCrypt.Verify(senha, cliente.SenhaHash))
+                    throw new UnauthorizedAccessException("Email ou senha inválidos.");
+                return MapearParaDto(cliente);
+            }
+
+            var caixa = await _context.Caixas.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
+            if (caixa != null)
+            {
+                if (!BCrypt.Net.BCrypt.Verify(senha, caixa.SenhaHash))
+                    throw new UnauthorizedAccessException("Email ou senha inválidos.");
+                return MapearParaDto(caixa);
+            }
+
+            var gerente = await _context.Gerentes.AsNoTracking().FirstOrDefaultAsync(g => g.Email == email);
+            if (gerente != null)
+            {
+                if (!BCrypt.Net.BCrypt.Verify(senha, gerente.SenhaHash))
+                    throw new UnauthorizedAccessException("Email ou senha inválidos.");
+                return MapearParaDto(gerente);
+            }
+
+            return null;
         }
     }
 }

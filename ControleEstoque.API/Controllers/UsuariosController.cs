@@ -1,6 +1,7 @@
 using ControleEstoque.API.Data;
 using ControleEstoque.API.DTOs;
 using ControleEstoque.API.Services;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using ControleEstoque.API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -54,24 +55,21 @@ namespace ControleEstoque.API.Controllers
             var novoGerente = await _usuarioService.RegistrarGerenteAsync(dto);
             return Ok(novoGerente);
         }
-
-
-        [AllowAnonymous]
+                [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (usuario == null)
+            try
             {
-                return Unauthorized("Usuário inválido");
+                var usuario = await _usuarioService.LoginAsync(dto.Email, dto.Senha);
+                // Se desejar, gere e retorne um JWT aqui em vez de apenas o DTO.
+                return Ok(usuario);
             }
-
-            // sem BCrypt por enquanto
-            if (usuario.SenhaHash != dto.Senha)
+            catch (UnauthorizedAccessException)
             {
-                return Unauthorized("Senha inválida");
+                return Unauthorized(new { mensagem = "Email ou senha invï¿½lidos." });
             }
 
             var token = _tokenService.GerarToken(usuario);
@@ -81,7 +79,5 @@ namespace ControleEstoque.API.Controllers
                 token = token
             });
         }
-
-
     }
 }
