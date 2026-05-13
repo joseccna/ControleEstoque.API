@@ -101,9 +101,9 @@ namespace ControleEstoque.API.Services
         }
 
 
-        public async Task<UsuarioDto?> LoginAsync(string email, string senha)
+        public async Task<loginDto?> LoginAsync(string email, string senha)
         {
-            // Tenta encontrar usuário na tabela base Usuarios (TPH) primeiro
+            // Tenta encontrar usuï¿½rio na tabela base Usuarios (TPH) primeiro
             var usuario = await _context.Usuarios
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == email);
@@ -113,7 +113,7 @@ namespace ControleEstoque.API.Services
             if (cliente != null)
             {
                 if (!BCrypt.Net.BCrypt.Verify(senha, cliente.SenhaHash))
-                    throw new UnauthorizedAccessException("Email ou senha inválidos.");
+                    throw new UnauthorizedAccessException("Email ou senha invï¿½lidos.");
                 return MapearParaDto(cliente);
             }
 
@@ -121,7 +121,7 @@ namespace ControleEstoque.API.Services
             if (caixa != null)
             {
                 if (!BCrypt.Net.BCrypt.Verify(senha, caixa.SenhaHash))
-                    throw new UnauthorizedAccessException("Email ou senha inválidos.");
+                    throw new UnauthorizedAccessException("Email ou senha invï¿½lidos.");
                 return MapearParaDto(caixa);
             }
 
@@ -129,7 +129,7 @@ namespace ControleEstoque.API.Services
             if (gerente != null)
             {
                 if (!BCrypt.Net.BCrypt.Verify(senha, gerente.SenhaHash))
-                    throw new UnauthorizedAccessException("Email ou senha inválidos.");
+                    throw new UnauthorizedAccessException("Email ou senha invï¿½lidos.");
                 return MapearParaDto(gerente);
             }
 
