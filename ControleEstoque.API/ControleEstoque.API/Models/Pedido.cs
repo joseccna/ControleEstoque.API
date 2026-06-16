@@ -21,6 +21,10 @@ namespace ControleEstoque.API.Models
         public int? CaixaId { get; set; }
         public Caixa Caixa { get; set; }
 
+        [ForeignKey("FormaPagamento")] // Forma de pagamento do pedido
+        public int? FormaPagamentoId { get; set; }
+        public FormaPagamento? FormaPagamento { get; set; }
+
         public ICollection<ItemPedido> Itens { get; set; } = new List<ItemPedido>();        
     }
 }
