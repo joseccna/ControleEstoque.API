@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ControleEstoque.API.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ControleEstoque.API.Models
@@ -10,8 +11,8 @@ namespace ControleEstoque.API.Models
 
         public DateTime DataPedido { get; set; } = DateTime.Now;
 
-        [Required, StringLength(20)]
-        public string Status { get; set; } // aberto, fechado, supspenso...
+        [Required]
+        public StatusPedido Status { get; set; }
 
         [ForeignKey("Cliente")] // Cliente que fez o pedido
         public int ClienteId { get; set; }

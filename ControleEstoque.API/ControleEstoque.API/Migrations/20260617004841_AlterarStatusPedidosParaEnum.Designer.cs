@@ -4,6 +4,7 @@ using ControleEstoque.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ControleEstoque.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260617004841_AlterarStatusPedidosParaEnum")]
+    partial class AlterarStatusPedidosParaEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,32 +81,6 @@ namespace ControleEstoque.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FormasPagamento");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Nome = "Pix",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Nome = "Cartão de Crédito",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Nome = "Cartão de Débito",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Nome = "Dinheiro",
-                            Status = 0
-                        });
                 });
 
             modelBuilder.Entity("ControleEstoque.API.Models.Fornecedor", b =>

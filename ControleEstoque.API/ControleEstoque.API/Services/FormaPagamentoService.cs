@@ -1,5 +1,6 @@
 ﻿using ControleEstoque.API.Data;
 using ControleEstoque.API.DTOs;
+using ControleEstoque.API.Enums;
 using ControleEstoque.API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +17,12 @@ namespace ControleEstoque.API.Services
 
         public async Task<IEnumerable<FormaPagamentoDto>> ObterTodosAsync()
         {
-            return await _context.FormasPagamento
+            return await _context.FormasPagamento.Where(fp => fp.Status == StatusFormaPagamentos.Ativo)
                 .Select(fp => new FormaPagamentoDto
                 {
                     Id = fp.Id,
-                    Nome = fp.Nome
+                    Nome = fp.Nome,
+                    Status = fp.Status.ToString()
                 })
                 .ToListAsync();
         }
@@ -35,7 +37,8 @@ namespace ControleEstoque.API.Services
             return new FormaPagamentoDto
             {
                 Id = forma.Id,
-                Nome = forma.Nome
+                Nome = forma.Nome,
+                Status = forma.Status.ToString()
             };
         }
 
@@ -43,7 +46,8 @@ namespace ControleEstoque.API.Services
         {
             var forma = new FormaPagamento
             {
-                Nome = dto.Nome
+                Nome = dto.Nome,
+                Status = StatusFormaPagamentos.Ativo
             };
 
             _context.FormasPagamento.Add(forma);
@@ -53,7 +57,8 @@ namespace ControleEstoque.API.Services
             return new FormaPagamentoDto
             {
                 Id = forma.Id,
-                Nome = forma.Nome
+                Nome = forma.Nome,
+                Status = forma.Status.ToString()
             };
         }
 
@@ -65,6 +70,7 @@ namespace ControleEstoque.API.Services
                 return false;
 
             forma.Nome = dto.Nome;
+            forma.Status = StatusFormaPagamentos.Ativo;
 
             await _context.SaveChangesAsync();
 
@@ -78,7 +84,7 @@ namespace ControleEstoque.API.Services
             if (forma == null)
                 return false;
 
-            _context.FormasPagamento.Remove(forma);
+            forma.Status = StatusFormaPagamentos.Inativo;
 
             await _context.SaveChangesAsync();
 

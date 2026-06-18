@@ -1,13 +1,13 @@
-﻿﻿using ControleEstoque.API.Models;
+﻿using ControleEstoque.API.Enums;
+using ControleEstoque.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ControleEstoque.API.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
@@ -23,8 +23,34 @@ namespace ControleEstoque.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Adiciona configurações extras, além dos decarators
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<FormaPagamento>().HasData(
+                new FormaPagamento
+                {
+                    Id = 1,
+                    Nome = "Pix",
+                    Status = StatusFormaPagamentos.Ativo
+                },
+                new FormaPagamento
+                {
+                    Id = 2,
+                    Nome = "Cartão de Crédito",
+                    Status = StatusFormaPagamentos.Ativo
+                },
+                new FormaPagamento
+                {
+                    Id = 3,
+                    Nome = "Cartão de Débito",
+                    Status = StatusFormaPagamentos.Ativo
+                },
+                new FormaPagamento
+                {
+                    Id = 4,
+                    Nome = "Dinheiro",
+                    Status = StatusFormaPagamentos.Ativo
+                }
+            );
         }
     }
 }

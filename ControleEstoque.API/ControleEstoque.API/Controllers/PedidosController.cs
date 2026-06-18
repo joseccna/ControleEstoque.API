@@ -67,7 +67,7 @@ namespace ControleEstoque.API.Controllers
                     Quantidade = i.Quantidade
                 }).ToList();
 
-                var novoPedido = await _pedidoService.CriarPedidoAsync(clienteId, itensPedido);
+                var novoPedido = await _pedidoService.CriarPedidoAsync(clienteId, pedido.FormaPagamentoId, itensPedido);
                 
                 return CreatedAtAction(nameof(GetPedido), new { id = novoPedido.Id }, new 
                 { 
@@ -81,5 +81,56 @@ namespace ControleEstoque.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+                [HttpPut("{id}/status")]
+                public async Task<IActionResult> AtualizarStatus(
+            int id,
+            AtualizarStatusPedidoDto dto)
+                {
+                    var sucesso = await _pedidoService
+                        .AtualizarStatusPedidoAsync(id, dto.Status);
+
+                    if (!sucesso)
+                        return NotFound();
+
+                    return NoContent();
+                }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPedidos()
+        {
+            var pedidos = await _pedidoService.ObterTodosAsync();
+
+            var pedidosDto = pedidos.Select(p => new PedidoDto
+            {
+                Id = p.Id,
+                DataPedido = p.DataPedido,
+                Status = p.Status,
+                ClienteId = p.ClienteId,
+                Itens = p.Itens.Select(i => new ItemPedidoDto
+                {
+                    Id = i.Id,
+                    Quantidade = i.Quantidade,
+                    PrecoUnitario = i.PrecoUnitario,
+                    ProdutoId = i.ProdutoId,
+                    ProdutoNome = i.Produto?.Nome ?? string.Empty
+                }).ToList()
+            }).ToList();
+            return Ok(pedidosDto);
+        }
+
+        [HttpPut("{id}/cancelar")]
+        public async Task<IActionResult> Cancelar(int id)
+        {
+            var sucesso = await _pedidoService.CancelarPedidoAsync(id);
+
+            if (!sucesso)
+                return NotFound();
+
+            return NoContent();
+        }
+
+
+
     }
 }
